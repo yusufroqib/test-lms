@@ -16,6 +16,8 @@ import {
 } from "@/contracts/coursePayment";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import toast from "react-hot-toast";
+import useAuth from "./useAuth";
+import truncateWalletAddress from "@/lib/truncateWalletAddress";
 
 const CORRECT_CHAIN_ID = parseInt(import.meta.env.VITE_CHAIN_ID, 10);
 
@@ -28,9 +30,9 @@ export function useCoursePayment() {
 	const { address, isConnected, chain } = useAccount();
 	const { openConnectModal } = useConnectModal();
 	const { switchChain } = useSwitchChain();
+	const { paymentWallet } = useAuth();
 
-	// const { chains } = useConfig()
-	// console.log(chain)
+	const truncateAddress = truncateWalletAddress(paymentWallet);
 
 	// Helper function to check if the wallet is connected
 	const checkConnectionAndChain = useCallback(async () => {
@@ -39,10 +41,16 @@ export function useCoursePayment() {
 			openConnectModal?.();
 			return false;
 		}
+		if (paymentWallet !== address) {
+			// toast.error(Please connect the correct wallet to interact.");
+			toast.error(`Please connect the correct wallet ${truncateAddress}.`);
+			return false;
+		}
 		if (chain?.id !== CORRECT_CHAIN_ID) {
 			toast.error("Switching to the correct network...");
 			try {
-				await switchChain({ chainId: CORRECT_CHAIN_ID });
+				 switchChain({ chainId: CORRECT_CHAIN_ID });
+         return false
 			} catch (error) {
 				console.error("Failed to switch network:", error);
 				toast.error("Failed to switch network. Please switch manually.");
@@ -50,7 +58,7 @@ export function useCoursePayment() {
 			}
 		}
 		return true;
-	}, [isConnected, openConnectModal, chain, switchChain]);
+	}, [isConnected, openConnectModal, chain, switchChain, paymentWallet, address]);
 
 	// Wrap contract write functions with the connection check
 	const wrapWithConnectionAndChainCheck = useCallback(
@@ -175,7 +183,7 @@ export function useCoursePayment() {
 			registerTutorError?.cause?.code === 4001
 				? "User denied transaction signature."
 				: registerTutorError?.cause?.reason,
-        
+
 		updateTutorAddress,
 		withdrawTutorBalance,
 		purchaseCourse,

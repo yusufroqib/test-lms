@@ -31,10 +31,16 @@ import useAuth from "@/hooks/useAuth";
 import truncateWalletAddress from "@/lib/truncateWalletAddress";
 // import { toast } from "@/components/ui/use-toast";
 
-export const ConfirmPublishModal = ({ children, onConfirm, price }) => {
+export const ConfirmPublishModal = ({
+	children,
+	onConfirm,
+	price,
+	isPublished,
+	open,
+	setOpen,
+}) => {
 	const { _id, status, paymentWallet, stripeOnboardingComplete } = useAuth();
-	const [open, setOpen] = useState(false);
-	console.log(price);
+	// console.log(price);
 	// const stripeOnboardingComplete = true;
 	const FormSchema = z.object({
 		items: z
@@ -77,79 +83,96 @@ export const ConfirmPublishModal = ({ children, onConfirm, price }) => {
 			<AlertDialogTrigger asChild>{children}</AlertDialogTrigger>
 			<AlertDialogContent>
 				<AlertDialogHeader>
-					<AlertDialogTitle>Payment Option</AlertDialogTitle>
+					<AlertDialogTitle>
+						{!isPublished ? "Payment Option" : "Unpublish Course"}
+					</AlertDialogTitle>
 					<AlertDialogDescription>
-						Select the mode of payment you want for this course.
+						{!isPublished
+							? "Select the mode of payment you want for this course."
+							: "Are you sure you want to unpublish this course?"}
 					</AlertDialogDescription>
 				</AlertDialogHeader>
-				<Form {...form}>
-					<form onSubmit={form.handleSubmit(onConfirm)} className="space-y-8">
-						<FormField
-							control={form.control}
-							name="items"
-							render={() => (
-								<FormItem>
-									{items.map((item) => (
-										<FormField
-											key={item.id}
-											control={form.control}
-											name="items"
-											render={({ field }) => (
-												<FormItem
-													key={item.id}
-													className="flex flex-row items-start space-x-3 space-y-0"
-												>
-													<FormControl>
-														<Checkbox
-															checked={field?.value?.includes(item.id)}
-															disabled={
-																(item.id === "crypto" && !paymentWallet) ||
-																(item.id === "card" &&
-																	!stripeOnboardingComplete) ||
-																!price
-															}
-															onCheckedChange={(checked) => {
-																return checked
-																	? field.onChange([...field.value, item.id])
-																	: field.onChange(
-																			field.value?.filter(
-																				(value) => value !== item.id
-																			)
-																	  );
-															}}
-														/>
-													</FormControl>
-													<FormLabel className="font-normal">
-														{item.label}
-													</FormLabel>
-												</FormItem>
-											)}
-										/>
-									))}
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<AlertDialogFooter>
-							<Button
-								type="button"
-								variant="outline"
-								onClick={() => setOpen(false)}
-							>
-								Cancel
-							</Button>
-							<Button
-								disabled={(!isValid && price) || isSubmitting}
-								type="submit"
-							>
-								Submit
-							</Button>
-						</AlertDialogFooter>
-						{/* <Button disabled={!isValid || isSubmitting} type="submit">
+				{!isPublished ? (
+					<Form {...form}>
+						<form onSubmit={form.handleSubmit(onConfirm)} className="space-y-8">
+							<FormField
+								control={form.control}
+								name="items"
+								render={() => (
+									<FormItem>
+										{items.map((item) => (
+											<FormField
+												key={item.id}
+												control={form.control}
+												name="items"
+												render={({ field }) => (
+													<FormItem
+														key={item.id}
+														className="flex flex-row items-start space-x-3 space-y-0"
+													>
+														<FormControl>
+															<Checkbox
+																checked={field?.value?.includes(item.id)}
+																disabled={
+																	(item.id === "crypto" && !paymentWallet) ||
+																	(item.id === "card" &&
+																		!stripeOnboardingComplete) ||
+																	!price
+																}
+																onCheckedChange={(checked) => {
+																	return checked
+																		? field.onChange([...field.value, item.id])
+																		: field.onChange(
+																				field.value?.filter(
+																					(value) => value !== item.id
+																				)
+																		  );
+																}}
+															/>
+														</FormControl>
+														<FormLabel className="font-normal">
+															{item.label}
+														</FormLabel>
+													</FormItem>
+												)}
+											/>
+										))}
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							<AlertDialogFooter>
+								<Button
+									type="button"
+									variant="outline"
+									onClick={() => setOpen(false)}
+								>
+									Cancel
+								</Button>
+								<Button
+									disabled={(!isValid && price) || isSubmitting}
+									type="submit"
+								>
+									Publish
+								</Button>
+							</AlertDialogFooter>
+							{/* <Button disabled={!isValid || isSubmitting} type="submit">
 								Submit
 							</Button> */}
-					</form>
-				</Form>
+						</form>
+					</Form>
+				) : (
+					<AlertDialogFooter>
+						<Button
+							type="button"
+							variant="outline"
+							onClick={() => setOpen(false)}
+						>
+							Cancel
+						</Button>
+						<Button onClick={onConfirm}>Unpublish</Button>
+					</AlertDialogFooter>
+				)}
 				{/* <AlertDialogFooter>
 					<AlertDialogCancel>Cancel</AlertDialogCancel>
 					<AlertDialogAction

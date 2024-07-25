@@ -37,7 +37,9 @@ export const Actions = ({
 	const [toggleCoursePublish] = useToggleCoursePublishMutation(); // Ensure you have the appropriate mutation hook
 	const [deleteCourse] = useDeleteCourseMutation(); // Ensure you have the appropriate mutation hook
 	const navigate = useNavigate();
-	console.log(price);
+	const [open, setOpen] = useState(false);
+
+	// console.log(price);
 
 	const deleteFolderAndContents = async (folderPath) => {
 		const storage = getStorage();
@@ -76,45 +78,52 @@ export const Actions = ({
 	};
 
 	const onClick = async (data) => {
-		console.log(data);
 		let paymentMethod;
-		if (data.items.includes('card') && data.items.includes("crypto")) {
-			paymentMethod = "both";
-		} else if (data.items.includes("card")) {
-			paymentMethod = "card";
-		} else if (data.items.includes("crypto")) {
-			paymentMethod = "crypto";
-		} else if (data.items.includes('card') && data.items.includes("crypto")) {
-			paymentMethod = "both";
-		}
-		console.log(paymentMethod)
+
 		try {
-			// setIsLoading(true);
-			// if (isPublished) {
-			// 	await toggleCoursePublish({
-			// 		id: courseId,
-			// 	}).unwrap();
-			// 	toast.success("Course unpublished");
-			// } else {
-			// 	const channel = await streamChatClient.channel("messaging", courseId, {
-			// 		name: title,
-			// 		image: courseImage,
-			// 		// members: [_id, ...memberIds],
-			// 	});
-			// 	await channel.create();
-
-			// 	await toggleCoursePublish({
-			// 		id: courseId,
-			// 	}).unwrap();
-			// 	// console.log(channel);
-
-			// 	toast.success("Course published");
-			// 	// confetti.onOpen();
-			// 	dispatch(openConfetti());
-			// }
+			setIsLoading(true);
+			if (isPublished) {
+				await toggleCoursePublish({
+					id: courseId,
+				}).unwrap();
+				toast.success("Course unpublished");
+				setOpen(false);
+			} else {
+				if (data.items.includes("card") && data.items.includes("crypto")) {
+					paymentMethod = "both";
+				} else if (data.items.includes("card")) {
+					paymentMethod = "card";
+				} else if (data.items.includes("crypto")) {
+					paymentMethod = "crypto";
+				} else if (
+					data.items.includes("card") &&
+					data.items.includes("crypto")
+				) {
+					paymentMethod = "both";
+				}
+				const channel = await streamChatClient.channel("messaging", courseId, {
+					name: title,
+					image: courseImage,
+					// members: [_id, ...memberIds],
+				});
+				await channel.create();
+				await toggleCoursePublish({
+					id: courseId,
+					paymentMethod,
+				}).unwrap();
+				console.log(paymentMethod);
+				toast.success("Course published");
+				// confetti.onOpen();
+				dispatch(openConfetti());
+				setOpen(false);
+			}
 		} catch (error) {
 			console.log(error);
-			toast.error("Something went wrong");
+			if (error?.data?.message) {
+				toast.error(error.data.message);
+			} else {
+				toast.error("Something went wrong");
+			}
 		} finally {
 			setIsLoading(false);
 		}
@@ -140,13 +149,14 @@ export const Actions = ({
 	};
 	return (
 		<div className="flex items-center gap-x-2">
-			<ConfirmPublishModal price={price} onConfirm={onClick}>
-				<Button
-					// onClick={onClick}
-					// disabled={disabled || isLoading}
-					variant="outline"
-					size="sm"
-				>
+			<ConfirmPublishModal
+				open={open}
+				setOpen={setOpen}
+				isPublished={isPublished}
+				price={price}
+				onConfirm={onClick}
+			>
+				<Button disabled={disabled || isLoading} variant="outline" size="sm">
 					{isPublished ? "Unpublish" : "Publish"}
 				</Button>
 			</ConfirmPublishModal>

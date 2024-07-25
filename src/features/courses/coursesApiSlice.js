@@ -60,7 +60,7 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 			},
 		}),
 		getCourseReviews: builder.query({
-			query: ({courseId, page}) => ({
+			query: ({ courseId, page }) => ({
 				url: `/courses/${courseId}/reviews?page=${page}`,
 				validateStatus: (response, result) => {
 					return response.status === 200 && !result.isError;
@@ -71,7 +71,7 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 			},
 		}),
 		addCourseReview: builder.mutation({
-			query: ({courseId, ...userReview}) => ({
+			query: ({ courseId, ...userReview }) => ({
 				url: `/courses/${courseId}/reviews`,
 				method: "POST",
 				body: userReview,
@@ -84,7 +84,7 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 			},
 			invalidatesTags: ["Course"],
 		}),
-		
+
 		getTutorCourses: builder.query({
 			query: () => ({
 				url: `/tutors/all-courses`,
@@ -170,9 +170,8 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 			}),
 
 			transformResponse: (responseData) => {
-				return responseData
-				
-			},			
+				return responseData;
+			},
 		}),
 		getTutorCoursesSold: builder.query({
 			query: () => ({
@@ -184,10 +183,8 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 			}),
 
 			transformResponse: (responseData) => {
-				return responseData
-				
+				return responseData;
 			},
-
 		}),
 		getStudyTime: builder.query({
 			query: ({ startDate, endDate, groupBy }) => ({
@@ -199,7 +196,7 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 			}),
 
 			transformResponse: (responseData) => {
-				return responseData
+				return responseData;
 				// console.log(responseData)
 				// const summary = responseData.map((item) => {
 				// 	item.id = item._id;
@@ -220,7 +217,6 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 					];
 				} else return [{ type: "StudyTimeSummary", id: "LIST" }];
 			},
-			
 		}),
 		createCourseTitle: builder.mutation({
 			query: (data) => ({

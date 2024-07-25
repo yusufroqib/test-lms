@@ -26,8 +26,6 @@ import { Button } from "@/components/ui/button";
 import useAuth from "@/hooks/useAuth";
 import { useAccount} from "wagmi";
 import RegisterTutorBtn from "@/components/web3/RegisterTutorBtn";
-import { CheckboxReactHookFormMultiple } from "@/components/FormCustom";
-import { ConfirmPublishModal } from "@/pages/tutor/courses/editCourse/components/ConfirmPublishModal";
 
 const TUTOR_SHARE = import.meta.env.VITE_TUTOR_SHARE;
 
@@ -74,13 +72,9 @@ const TutorDashboard = ({ setDashboardMode }) => {
 
 	return (
 		<div className="flex-1 p-8  space-y-6">
-				<CheckboxReactHookFormMultiple/>
 			<div className="flex justify-end">
 				<RegisterTutorBtn label={"Just register"}/>
 
-				<ConfirmPublishModal>
-					<Button>Test me</Button>
-				</ConfirmPublishModal>
 			
 				<Button
 					variant="outline"
