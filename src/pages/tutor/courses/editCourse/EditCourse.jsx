@@ -101,6 +101,7 @@ const EditCourse = () => {
 							</span>
 						</div>
 						<Actions
+							price={course.price}
 							title={course.title}
 							courseImage={course.courseImage}
 							disabled={!isComplete}

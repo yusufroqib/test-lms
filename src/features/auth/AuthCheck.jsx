@@ -1,16 +1,20 @@
 import { useDispatch } from "react-redux";
 // AuthCheck.js
 import { useEffect } from "react";
-import { useAccount, useDisconnect } from "wagmi";
+import { useAccount, useDisconnect, useSwitchChain } from "wagmi";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import useAuth from "@/hooks/useAuth";
 import { setWalletAuthStatus } from "./authSlice";
 
+const CHAIN_ID = import.meta.env.VITE_CHAIN_ID
+
 export function AuthCheck({ walletAuthStatus }) {
 	const dispatch = useDispatch();
 	const { _id: userId, connectedWallets } = useAuth();
-	const { isConnected, address } = useAccount();
+	const { isConnected, address, chain } = useAccount();
+    // console.log(chains)
+
 
 	useEffect(() => {
 		if (

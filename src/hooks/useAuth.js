@@ -10,7 +10,7 @@ const useAuth = () => {
 
 	if (token) {
 		const decoded = jwtDecode(token);
-		const { _id, username, roles, fullName, image, streamToken, stripeOnboardingComplete, connectedWallets } =
+		const { _id, username, roles, fullName, image, streamToken, stripeOnboardingComplete, connectedWallets, paymentWallet } =
 			decoded.UserInfo;
 
 		isTutor = roles.includes("Tutor");
@@ -28,6 +28,7 @@ const useAuth = () => {
 			isAdmin,
 			fullName,
 			connectedWallets,
+			paymentWallet,
 			image,
 			streamToken,
 			stripeOnboardingComplete
@@ -42,6 +43,7 @@ const useAuth = () => {
 		isAdmin,
 		status,
 		fullName: "",
+		paymentWallet: "",
 		connectedWallets: [],
 		image: "",
 		streamToken: "",

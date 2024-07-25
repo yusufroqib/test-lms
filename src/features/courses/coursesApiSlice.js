@@ -278,9 +278,10 @@ export const coursesApiSlice = apiSlice.injectEndpoints({
 			],
 		}),
 		toggleCoursePublish: builder.mutation({
-			query: ({ id }) => ({
+			query: ({ id, paymentMethod }) => ({
 				url: `/tutors/edit-course/${id}/toggle-publish`,
 				method: "PUT",
+				body: { paymentMethod },
 			}),
 			invalidatesTags: (result, error, arg) => [
 				{ type: "TutorCourse", id: arg.id },

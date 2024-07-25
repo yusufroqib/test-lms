@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
 	BookCheck,
 	BookUp2,
@@ -23,15 +23,17 @@ import {
 	useGetTutorBalanceQuery,
 } from "@/features/users/usersApiSlice";
 import { Button } from "@/components/ui/button";
-import { useCoursePayment } from "@/hooks/useCoursePayment";
 import useAuth from "@/hooks/useAuth";
-import { useAccount } from "wagmi";
+import { useAccount} from "wagmi";
+import RegisterTutorBtn from "@/components/web3/RegisterTutorBtn";
+import { CheckboxReactHookFormMultiple } from "@/components/FormCustom";
+import { ConfirmPublishModal } from "@/pages/tutor/courses/editCourse/components/ConfirmPublishModal";
 
 const TUTOR_SHARE = import.meta.env.VITE_TUTOR_SHARE;
 
 const TutorDashboard = ({ setDashboardMode }) => {
-	const { registerTutor } = useCoursePayment();
-	const { _id: tutorId } = useAuth();
+
+
 
 	const { myDetails } = useGetMyDetailsQuery("myDetails", {
 		selectFromResult: ({
@@ -54,15 +56,11 @@ const TutorDashboard = ({ setDashboardMode }) => {
 	const { data: topCourses } = useGetTutorTopCoursesQuery();
 	const { data: courseTransactions, error } = useGetTutorCoursesSoldQuery();
 	const { data: tutorBalance, error: balanceError } = useGetTutorBalanceQuery();
-	const {status, address} = useAccount();
-	// console.log(status)
+	const { status, address } = useAccount();
+	console.log(address);
+	// console.log(registerTutorError);
 
-	// useAccount
 
-	// console.log(tutorBalance);
-	const handleRegister = () => {
-		registerTutor(tutorId);
-	};
 
 	// console.log(courseTransactions);
 
@@ -76,8 +74,14 @@ const TutorDashboard = ({ setDashboardMode }) => {
 
 	return (
 		<div className="flex-1 p-8  space-y-6">
+				<CheckboxReactHookFormMultiple/>
 			<div className="flex justify-end">
-				<Button onClick={handleRegister}>Register Tutor</Button>
+				<RegisterTutorBtn label={"Just register"}/>
+
+				<ConfirmPublishModal>
+					<Button>Test me</Button>
+				</ConfirmPublishModal>
+			
 				<Button
 					variant="outline"
 					className="flex gap-2 max-md:text-xs text-sm"
