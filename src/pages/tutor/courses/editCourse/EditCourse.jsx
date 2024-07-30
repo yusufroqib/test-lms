@@ -45,10 +45,7 @@ const EditCourse = () => {
 
 	const { data } = useGetCourseCategoriesQuery("courseCategories");
 
-	// console.log(categories)
 
-	// console.log(import.meta.env.VITE_FIREBASE_API_KEY)
-	// console.log(isSuccess);
 	let requiredFields;
 	// useEffect(() => {}, []);
 	if (isError) {

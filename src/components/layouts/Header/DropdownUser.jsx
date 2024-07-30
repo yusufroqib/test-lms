@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useEffect, useRef, useState } from "react";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import UserOne from "../../images/user/user-01.png";
 import useAuth from "@/hooks/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -10,6 +10,7 @@ import { useDisconnect } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import CustomConnectButton from "@/components/CustomConnectButton";
 import Overlay from "./Overlay";
+import SidebarLinkGroup from "../sidebar/SidebarLinkGroup";
 
 const DropdownUser = () => {
 	const { fullName, image, status, stripeOnboardingComplete } = useAuth();
@@ -124,30 +125,90 @@ const DropdownUser = () => {
 				>
 					<ul className="flex flex-col gap-5 border-b border-stroke px-6 py-7.5 dark:border-strokedark">
 						<li>
-							<Link
-								onClick={() => setDropdownOpen(false)}
-								to="/profile"
-								className="flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-blue-500 lg:text-base"
+							<SidebarLinkGroup
+							// activeCondition={
+							// 	pathname === "/tutors/" || pathname.includes("tutors")
+							// }
 							>
-								<svg
-									className="fill-current"
-									width="22"
-									height="22"
-									viewBox="0 0 22 22"
-									fill="none"
-									xmlns="http://www.w3.org/2000/svg"
-								>
-									<path
-										d="M11 9.62499C8.42188 9.62499 6.35938 7.59687 6.35938 5.12187C6.35938 2.64687 8.42188 0.618744 11 0.618744C13.5781 0.618744 15.6406 2.64687 15.6406 5.12187C15.6406 7.59687 13.5781 9.62499 11 9.62499ZM11 2.16562C9.28125 2.16562 7.90625 3.50624 7.90625 5.12187C7.90625 6.73749 9.28125 8.07812 11 8.07812C12.7188 8.07812 14.0938 6.73749 14.0938 5.12187C14.0938 3.50624 12.7188 2.16562 11 2.16562Z"
-										fill=""
-									/>
-									<path
-										d="M17.7719 21.4156H4.2281C3.5406 21.4156 2.9906 20.8656 2.9906 20.1781V17.0844C2.9906 13.7156 5.7406 10.9656 9.10935 10.9656H12.925C16.2937 10.9656 19.0437 13.7156 19.0437 17.0844V20.1781C19.0094 20.8312 18.4594 21.4156 17.7719 21.4156ZM4.53748 19.8687H17.4969V17.0844C17.4969 14.575 15.4344 12.5125 12.925 12.5125H9.07498C6.5656 12.5125 4.5031 14.575 4.5031 17.0844V19.8687H4.53748Z"
-										fill=""
-									/>
-								</svg>
-								My Profile
-							</Link>
+								{(handleClick, open) => {
+									return (
+										<React.Fragment>
+											<div
+												// to="#"
+												className={`group cursor-pointer relative flex gap-2.5 rounded-sm py-0 font-medium text-gray-800 duration-300 ease-in-out `}
+												onClick={(e) => {
+													e.preventDefault();
+													handleClick();
+												}}
+											>
+												<svg
+													className="fill-current"
+													width="22"
+													height="22"
+													viewBox="0 0 22 22"
+													fill="none"
+													xmlns="http://www.w3.org/2000/svg"
+												>
+													<path
+														d="M11 9.62499C8.42188 9.62499 6.35938 7.59687 6.35938 5.12187C6.35938 2.64687 8.42188 0.618744 11 0.618744C13.5781 0.618744 15.6406 2.64687 15.6406 5.12187C15.6406 7.59687 13.5781 9.62499 11 9.62499ZM11 2.16562C9.28125 2.16562 7.90625 3.50624 7.90625 5.12187C7.90625 6.73749 9.28125 8.07812 11 8.07812C12.7188 8.07812 14.0938 6.73749 14.0938 5.12187C14.0938 3.50624 12.7188 2.16562 11 2.16562Z"
+														fill=""
+													/>
+													<path
+														d="M17.7719 21.4156H4.2281C3.5406 21.4156 2.9906 20.8656 2.9906 20.1781V17.0844C2.9906 13.7156 5.7406 10.9656 9.10935 10.9656H12.925C16.2937 10.9656 19.0437 13.7156 19.0437 17.0844V20.1781C19.0094 20.8312 18.4594 21.4156 17.7719 21.4156ZM4.53748 19.8687H17.4969V17.0844C17.4969 14.575 15.4344 12.5125 12.925 12.5125H9.07498C6.5656 12.5125 4.5031 14.575 4.5031 17.0844V19.8687H4.53748Z"
+														fill=""
+													/>
+												</svg>
+												Account
+												<svg
+													className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${
+														open && "rotate-180"
+													}`}
+													width="20"
+													height="20"
+													viewBox="0 0 20 20"
+													fill="none"
+													xmlns="http://www.w3.org/2000/svg"
+												>
+													<path
+														fillRule="evenodd"
+														clipRule="evenodd"
+														d="M4.41107 6.9107C4.73651 6.58527 5.26414 6.58527 5.58958 6.9107L10.0003 11.3214L14.4111 6.91071C14.7365 6.58527 15.2641 6.58527 15.5896 6.91071C15.915 7.23614 15.915 7.76378 15.5896 8.08922L10.5896 13.0892C10.2641 13.4147 9.73651 13.4147 9.41107 13.0892L4.41107 8.08922C4.08563 7.76378 4.08563 7.23614 4.41107 6.9107Z"
+														fill=""
+													/>
+												</svg>
+											</div>
+											{/* <!-- Dropdown Menu Start --> */}
+											<div
+												className={`translate transform overflow-hidden ${
+													!open && "hidden"
+												}`}
+											>
+												<ul className="mt-3 mb-3.5 flex flex-col gap-2.5 pl-6">
+													<li>
+														<Link
+															onClick={() => setDropdownOpen(false)}
+															to="/profile"
+															className="flex items-center gap-3.5 text-base opacity-55 font-medium duration-300 ease-in-out hover:text-blue-500 "
+														>
+															My Profile
+														</Link>
+													</li>
+													<li>
+														<Link
+															onClick={() => setDropdownOpen(false)}
+															to="/profile"
+															className="flex items-center gap-3.5 text-base opacity-55 font-medium duration-300 ease-in-out hover:text-blue-500 "
+														>
+															Known Devices{" "}
+														</Link>
+													</li>
+												</ul>
+											</div>
+											{/* <!-- Dropdown Menu End --> */}
+										</React.Fragment>
+									);
+								}}
+							</SidebarLinkGroup>
 						</li>
 
 						{status === "Student" && (
@@ -190,13 +251,82 @@ const DropdownUser = () => {
 						)}
 						{status === "Tutor" && (
 							<li>
-								<Link
+								<SidebarLinkGroup
+								// activeCondition={
+								// 	pathname === "/tutors/" || pathname.includes("tutors")
+								// }
+								>
+									{(handleClick, open) => {
+										return (
+											<React.Fragment>
+												<div
+													// to="#"
+													className={`group cursor-pointer relative flex gap-2.5 rounded-sm py-0 font-medium text-gray-800 duration-300 ease-in-out `}
+													onClick={(e) => {
+														e.preventDefault();
+														handleClick();
+													}}
+												>
+													<Wallet />
+													Wallets
+													<svg
+														className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${
+															open && "rotate-180"
+														}`}
+														width="20"
+														height="20"
+														viewBox="0 0 20 20"
+														fill="none"
+														xmlns="http://www.w3.org/2000/svg"
+													>
+														<path
+															fillRule="evenodd"
+															clipRule="evenodd"
+															d="M4.41107 6.9107C4.73651 6.58527 5.26414 6.58527 5.58958 6.9107L10.0003 11.3214L14.4111 6.91071C14.7365 6.58527 15.2641 6.58527 15.5896 6.91071C15.915 7.23614 15.915 7.76378 15.5896 8.08922L10.5896 13.0892C10.2641 13.4147 9.73651 13.4147 9.41107 13.0892L4.41107 8.08922C4.08563 7.76378 4.08563 7.23614 4.41107 6.9107Z"
+															fill=""
+														/>
+													</svg>
+												</div>
+												{/* <!-- Dropdown Menu Start --> */}
+												<div
+													className={`translate transform overflow-hidden ${
+														!open && "hidden"
+													}`}
+												>
+													<ul className="mt-3 mb-3.5 flex flex-col gap-2.5 pl-6">
+														<li>
+															<Link
+																onClick={() => setDropdownOpen(false)}
+																to="/tutors/withdraw"
+																className="flex items-center gap-3.5 text-base opacity-55 font-medium duration-300 ease-in-out hover:text-blue-500 "
+															>
+																Stripe 
+															</Link>
+														</li>
+														<li>
+															<Link
+																onClick={() => setDropdownOpen(false)}
+																to="/wallets/crypto"
+																className="flex items-center gap-3.5 text-base opacity-55 font-medium duration-300 ease-in-out hover:text-blue-500 "
+															>
+																USDC 
+															</Link>
+														</li>
+													</ul>
+												</div>
+												{/* <!-- Dropdown Menu End --> */}
+											</React.Fragment>
+										);
+									}}
+								</SidebarLinkGroup>
+								
+								{/* <Link
 									onClick={() => setDropdownOpen(false)}
 									to="/tutors/withdraw"
 									className="flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-blue-500 lg:text-base"
 								>
 									<Wallet /> Withdrawal
-								</Link>
+								</Link> */}
 							</li>
 						)}
 						<li>

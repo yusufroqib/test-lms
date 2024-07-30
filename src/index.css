@@ -35,6 +35,10 @@ body,
 	text-overflow: ellipsis;
 }
 
+.iekbcc0{
+	pointer-events:auto !important;
+}
+
 .rating-svg span svg {
 	height: 1rem;
 	width: 1rem;

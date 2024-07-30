@@ -14,6 +14,7 @@ import {
 	useGetTutorStatsQuery,
 	useGetTutorTopCoursesQuery,
 } from "@/features/courses/coursesApiSlice";
+
 import { Link } from "react-router-dom";
 import TutorEarningsChart from "./components/TutorEarningChart";
 import { DataTable } from "./components/DataTable";
@@ -24,15 +25,15 @@ import {
 } from "@/features/users/usersApiSlice";
 import { Button } from "@/components/ui/button";
 import useAuth from "@/hooks/useAuth";
-import { useAccount} from "wagmi";
+import { useAccount } from "wagmi";
 import RegisterTutorBtn from "@/components/web3/RegisterTutorBtn";
+import { useCoursePayment } from "@/hooks/useCoursePayment";
+import { formatUnits } from "viem";
+import { Tooltip } from "@material-tailwind/react";
 
 const TUTOR_SHARE = import.meta.env.VITE_TUTOR_SHARE;
 
 const TutorDashboard = ({ setDashboardMode }) => {
-
-
-
 	const { myDetails } = useGetMyDetailsQuery("myDetails", {
 		selectFromResult: ({
 			data,
@@ -50,17 +51,23 @@ const TutorDashboard = ({ setDashboardMode }) => {
 			isError,
 		}),
 	});
+	const { getTutorBalance } = useCoursePayment();
 	const { data: tutorStats, isLoading } = useGetTutorStatsQuery();
 	const { data: topCourses } = useGetTutorTopCoursesQuery();
 	const { data: courseTransactions, error } = useGetTutorCoursesSoldQuery();
 	const { data: tutorBalance, error: balanceError } = useGetTutorBalanceQuery();
+	const { _id: tutorId } = useAuth();
 	const { status, address } = useAccount();
-	console.log(address);
-	// console.log(registerTutorError);
+	const { data: tutorUSDCBalance } = getTutorBalance(tutorId);
+	// console.log(tutorUSDCBalance)
 
+	// console.log(Number(formatUnits(tutorUSDCBalance || 0, 6)));
 
+	// console.log(tutorUSDCBalance);
+	const stripeBalance =
+		(tutorBalance && tutorBalance?.available[0]?.amount / 100) || 0;
 
-	// console.log(courseTransactions);
+	const USDCBalance = Number(formatUnits(tutorUSDCBalance || 0, 6)) || 0;
 
 	if (isLoading) {
 		return (
@@ -73,9 +80,8 @@ const TutorDashboard = ({ setDashboardMode }) => {
 	return (
 		<div className="flex-1 p-8  space-y-6">
 			<div className="flex justify-end">
-				<RegisterTutorBtn label={"Just register"}/>
+				<RegisterTutorBtn label={"Just register"} />
 
-			
 				<Button
 					variant="outline"
 					className="flex gap-2 max-md:text-xs text-sm"
@@ -109,9 +115,27 @@ const TutorDashboard = ({ setDashboardMode }) => {
 					</h1>
 					<h1 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-semibold text-white text-right">
 						$
-						{(
-							tutorBalance && tutorBalance?.available[0]?.amount / 100
-						)?.toFixed(2) ?? "0.00"}
+						<Tooltip
+							content={
+								<>
+									<p>
+										<strong>Stripe: </strong>$
+										{stripeBalance?.toFixed(2) || "0.00"}
+									</p>
+									<p>
+										<strong>USDC: </strong>${USDCBalance?.toFixed(2) || "0.00"}
+									</p>
+								</>
+							}
+							placement="left"
+							animate={{
+								mount: { scale: 1, y: 0 },
+								unmount: { scale: 0, y: 25 },
+							}}
+							// className="hidden md:block"
+						>
+							{(stripeBalance + USDCBalance)?.toFixed(2) || "0.00"}
+						</Tooltip>
 					</h1>
 				</div>
 			</div>

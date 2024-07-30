@@ -1,4 +1,55 @@
-export const COURSE_PAYMENT_CA = "0x5635C6cE0674B08322988866C7cA6030698B71Ac";
+export const COURSE_PAYMENT_CA = "0x3A16cab6f258Ee0385DE64B23Cf3F9E2de838a92";
+export const USDC_CA = "0x2F25deB3848C207fc8E0c34035B3Ba7fC157602B";
+export const USDC_ABI = [
+	{
+		constant: true,
+		inputs: [{ name: "_owner", type: "address" }],
+		name: "balanceOf",
+		outputs: [{ name: "balance", type: "uint256" }],
+		type: "function",
+	},
+	{
+		constant: false,
+		inputs: [
+			{ name: "_spender", type: "address" },
+			{ name: "_value", type: "uint256" },
+		],
+		name: "approve",
+		outputs: [{ name: "", type: "bool" }],
+		type: "function",
+	},
+	{
+		constant: true,
+		inputs: [
+			{ name: "_owner", type: "address" },
+			{ name: "_spender", type: "address" },
+		],
+		name: "allowance",
+		outputs: [{ name: "", type: "uint256" }],
+		type: "function",
+	},
+	{
+		constant: false,
+		inputs: [
+			{ name: "_to", type: "address" },
+			{ name: "_value", type: "uint256" },
+		],
+		name: "transfer",
+		outputs: [{ name: "", type: "bool" }],
+		type: "function",
+	},
+	{
+		constant: false,
+		inputs: [
+			{ name: "_from", type: "address" },
+			{ name: "_to", type: "address" },
+			{ name: "_value", type: "uint256" },
+		],
+		name: "transferFrom",
+		outputs: [{ name: "", type: "bool" }],
+		type: "function",
+	},
+];
 export const COURSE_PAYMENT_ABI = [
 	{
 		inputs: [
@@ -10,6 +61,33 @@ export const COURSE_PAYMENT_ABI = [
 		],
 		stateMutability: "nonpayable",
 		type: "constructor",
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "target",
+				type: "address",
+			},
+		],
+		name: "AddressEmptyCode",
+		type: "error",
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "account",
+				type: "address",
+			},
+		],
+		name: "AddressInsufficientBalance",
+		type: "error",
+	},
+	{
+		inputs: [],
+		name: "FailedInnerCall",
+		type: "error",
 	},
 	{
 		inputs: [
@@ -31,6 +109,17 @@ export const COURSE_PAYMENT_ABI = [
 			},
 		],
 		name: "OwnableUnauthorizedAccount",
+		type: "error",
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "token",
+				type: "address",
+			},
+		],
+		name: "SafeERC20FailedOperation",
 		type: "error",
 	},
 	{
@@ -158,6 +247,30 @@ export const COURSE_PAYMENT_ABI = [
 		],
 		name: "TutorWithdrawal",
 		type: "event",
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "_user",
+				type: "address",
+			},
+			{
+				internalType: "uint256",
+				name: "_amount",
+				type: "uint256",
+			},
+		],
+		name: "checkAllowance",
+		outputs: [
+			{
+				internalType: "bool",
+				name: "",
+				type: "bool",
+			},
+		],
+		stateMutability: "view",
+		type: "function",
 	},
 	{
 		inputs: [],

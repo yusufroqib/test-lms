@@ -29,7 +29,6 @@ import {
 import toast from "react-hot-toast";
 import useAuth from "@/hooks/useAuth";
 import truncateWalletAddress from "@/lib/truncateWalletAddress";
-// import { toast } from "@/components/ui/use-toast";
 
 export const ConfirmPublishModal = ({
 	children,
@@ -40,8 +39,7 @@ export const ConfirmPublishModal = ({
 	setOpen,
 }) => {
 	const { _id, status, paymentWallet, stripeOnboardingComplete } = useAuth();
-	// console.log(price);
-	// const stripeOnboardingComplete = true;
+
 	const FormSchema = z.object({
 		items: z
 			.array(z.string())
@@ -67,32 +65,28 @@ export const ConfirmPublishModal = ({
 	];
 
 	const { isSubmitting, isValid } = form.formState;
-	// function onSubmit(data) {
-	// 	toast.custom(
-	// 		<div className="p-2">
-	// 			<h1 className="text-lg">You submitted the following values:</h1>
-	// 			<pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-	// 				<code className="text-white">{JSON.stringify(data, null, 2)}</code>
-	// 			</pre>
-	// 		</div>
-	// 	);
-	//     setOpen(false)
-	// }
+
 	return (
 		<AlertDialog open={open} onOpenChange={() => setOpen(true)}>
 			<AlertDialogTrigger asChild>{children}</AlertDialogTrigger>
 			<AlertDialogContent>
 				<AlertDialogHeader>
 					<AlertDialogTitle>
-						{!isPublished ? "Payment Option" : "Unpublish Course"}
+						{!isPublished && price
+							? "Payment Option"
+							: !isPublished && !price
+							? "Publish Free Course"
+							: "Unpublish Course"}
 					</AlertDialogTitle>
 					<AlertDialogDescription>
-						{!isPublished
+						{!isPublished && price
 							? "Select the mode of payment you want for this course."
+							: !isPublished && !price
+							? "This course will be published for free as no price was set"
 							: "Are you sure you want to unpublish this course?"}
 					</AlertDialogDescription>
 				</AlertDialogHeader>
-				{!isPublished ? (
+				{!isPublished && price ? (
 					<Form {...form}>
 						<form onSubmit={form.handleSubmit(onConfirm)} className="space-y-8">
 							<FormField
@@ -161,6 +155,26 @@ export const ConfirmPublishModal = ({
 							</Button> */}
 						</form>
 					</Form>
+				) : !isPublished && !price ? (
+					<Form {...form}>
+						<form onSubmit={form.handleSubmit(onConfirm)} className="space-y-8">
+							<AlertDialogFooter>
+								<Button
+									type="button"
+									variant="outline"
+									onClick={() => setOpen(false)}
+								>
+									Cancel
+								</Button>
+								<Button
+									disabled={(!isValid && price) || isSubmitting}
+									type="submit"
+								>
+									Publish
+								</Button>
+							</AlertDialogFooter>
+						</form>
+					</Form>
 				) : (
 					<AlertDialogFooter>
 						<Button
@@ -173,16 +187,6 @@ export const ConfirmPublishModal = ({
 						<Button onClick={onConfirm}>Unpublish</Button>
 					</AlertDialogFooter>
 				)}
-				{/* <AlertDialogFooter>
-					<AlertDialogCancel>Cancel</AlertDialogCancel>
-					<AlertDialogAction
-						for="publish-form"
-						disabled={!isValid || isSubmitting}
-						onClick={onConfirm}
-					>
-						Continue
-					</AlertDialogAction>
-				</AlertDialogFooter> */}
 			</AlertDialogContent>
 		</AlertDialog>
 	);

@@ -13,6 +13,7 @@ import Upcoming from "./pages/classroom/liveClassroomApp/upcoming/Upcoming";
 import Withdraw from "./pages/tutor/withdraw/Withdraw";
 import RootLayout from "./components/layouts/RootLayout";
 import { Loader2 } from "lucide-react";
+// import CryptoWallet from "./pages/tutor/wallets/CryptoWallet";
 
 // Lazy imports (constants)
 const AllTags = lazy(() => import("./pages/community/tags/allTags/AllTags"));
@@ -23,6 +24,7 @@ const BrowseCourses = lazy(() =>
 const ClassroomHome = lazy(() =>
 	import("./pages/classroom/liveClassroomApp/classroomHome/classroomHome")
 );
+const CryptoWallet = lazy(() => import("./pages/tutor/wallets/CryptoWallet"));
 const Classrooms = lazy(() => import("./pages/classroom/Classrooms"));
 const CommunityLayout = lazy(() => import("./pages/community/CommunityLayout"));
 const CourseInfo = lazy(() => import("./pages/courses/courseInfo/CourseInfo"));
@@ -136,6 +138,13 @@ function App() {
 											element={<StripeOnboardingComplete />}
 										/>
 										<Route path="withdraw" element={<Withdraw />} />
+									</Route>
+									<Route path="wallets">
+										<Route element={<SuspenseWrapper />}>
+											{/* <Route index element={<StudyIndex />} /> */}
+											<Route path="crypto" element={<CryptoWallet />} />
+											<Route path="stripe" element={<CryptoWallet />} />
+										</Route>
 									</Route>
 									<Route path="community" element={<CommunityLayout />}>
 										<Route path="feeds" element={<Feeds />} />

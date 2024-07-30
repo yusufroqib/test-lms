@@ -112,7 +112,11 @@ export const ChapterVideoForm = ({ initialData, courseId, chapterId }) => {
 				toggleEdit();
 				return toast.error("Upload Cancelled");
 			}
-			toast.error("Something went wrong");
+			if (error?.data?.message) {
+				toast.error(error.data.message);
+			} else {
+				toast.error("Something went wrong");
+			}
 		} finally {
 			setVid("");
 			setVidPerc(0);
@@ -133,12 +137,13 @@ export const ChapterVideoForm = ({ initialData, courseId, chapterId }) => {
 		video.onloadedmetadata = function () {
 			URL.revokeObjectURL(fileURL); // Free memory
 			const duration = video.duration;
-			console.log(duration)
+			console.log(duration);
 			if (duration > 1800) {
 				// Limit to 1 minute
-				toast.error("Video exceeds the maximum allowed duration of 30 minutes.");
+				toast.error(
+					"Video exceeds the maximum allowed duration of 30 minutes."
+				);
 				setVid(null);
-
 			} else {
 				setVid(file);
 				// Proceed with the upload or other operations

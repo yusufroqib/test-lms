@@ -79,7 +79,7 @@ export const WagmiConfigProvider = ({ children }) => {
 				if (location.pathname.includes("auth")) {
 					navigate("/dashboard");
 				}
-				await refresh().unwrap();
+				// await refresh().unwrap();
 			}
 		} catch (error) {
 			// setStatus("unauthenticated");

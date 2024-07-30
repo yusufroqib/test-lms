@@ -13,6 +13,8 @@ import { parseUnits, formatUnits } from "viem";
 import {
 	COURSE_PAYMENT_ABI,
 	COURSE_PAYMENT_CA,
+	USDC_ABI,
+	USDC_CA,
 } from "@/contracts/coursePayment";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import toast from "react-hot-toast";
@@ -49,8 +51,8 @@ export function useCoursePayment() {
 		if (chain?.id !== CORRECT_CHAIN_ID) {
 			toast.error("Switching to the correct network...");
 			try {
-				 switchChain({ chainId: CORRECT_CHAIN_ID });
-         return false
+				switchChain({ chainId: CORRECT_CHAIN_ID });
+				return false;
 			} catch (error) {
 				console.error("Failed to switch network:", error);
 				toast.error("Failed to switch network. Please switch manually.");
@@ -58,7 +60,14 @@ export function useCoursePayment() {
 			}
 		}
 		return true;
-	}, [isConnected, openConnectModal, chain, switchChain, paymentWallet, address]);
+	}, [
+		isConnected,
+		openConnectModal,
+		chain,
+		switchChain,
+		paymentWallet,
+		address,
+	]);
 
 	// Wrap contract write functions with the connection check
 	const wrapWithConnectionAndChainCheck = useCallback(
@@ -78,11 +87,45 @@ export function useCoursePayment() {
 		isPending: isRegisterTutorPending,
 		error: registerTutorError,
 	} = useWriteContract();
-	const { writeContract: updateTutorAddressRaw } = useWriteContract();
-	const { writeContract: withdrawTutorBalanceRaw } = useWriteContract();
-	const { writeContract: purchaseCourseRaw, data: purchaseData } =
-		useWriteContract();
+	const {
+		writeContract: updateTutorAddressRaw,
+		data: updateTutorAddressHash,
+		isPending: isUpdateTutorAddressPending,
+		error: updateTutorAddressError,
+	} = useWriteContract();
+	const {
+		writeContract: withdrawTutorBalanceRaw,
+		data: withdrawTutorBalanceHash,
+		isPending: isWithdrawTutorBalancePending,
+		error: withdrawTutorBalanceError,
+	} = useWriteContract();
+	const {
+		writeContract: purchaseCourseRaw,
+		data: purchaseDataHash,
+		isPending: isPurchasePending,
+		error: purchaseError,
+	} = useWriteContract();
+
+	const {
+		writeContract: approveUSDCRaw,
+		data: approveDataHash,
+		isPending: isApproving,
+		error: approveError,
+	} = useWriteContract({
+		address: USDC_CA,
+		abi: USDC_ABI,
+		functionName: "approve",
+	});
 	// console.log(error);
+
+	const approveUSDC = wrapWithConnectionAndChainCheck((amount) =>
+		approveUSDCRaw({
+			address: USDC_CA,
+			abi: USDC_ABI,
+			functionName: "approve",
+			args: [COURSE_PAYMENT_CA, parseUnits(amount, 6)],
+		})
+	);
 	// Register Tutor
 	const registerTutor = wrapWithConnectionAndChainCheck((tutorId) =>
 		registerTutorRaw({
@@ -115,6 +158,22 @@ export function useCoursePayment() {
 			})
 	);
 
+	//   const { data: isAllowanceSufficient } = useContractRead({
+	//     address: COURSE_PAYMENT_ADDRESS,
+	//     abi: COURSE_PAYMENT_ABI,
+	//     functionName: 'checkAllowance',
+	//     args: [address, parseUnits(price.toString(), 6)],
+	// });
+
+	const getAllowanceStat = useCallback((address, price) => {
+		return useReadContract({
+			address: COURSE_PAYMENT_CA,
+			abi: COURSE_PAYMENT_ABI,
+			functionName: "checkAllowance",
+			args: [address, parseUnits(price, 6)],
+		});
+	}, []);
+
 	// Purchase Course
 	const purchaseCourse = wrapWithConnectionAndChainCheck(
 		(tutorId, amount, courseId) =>
@@ -130,12 +189,8 @@ export function useCoursePayment() {
 	//   hash: purchaseData?.hash,
 	// })
 
-	const { isLoading: isPurchaseProcessing, isSuccess: isPurchaseComplete } =
-		useWaitForTransactionReceipt({
-			hash: purchaseData?.hash,
-		});
-
 	// Get Tutor Balance
+
 	const getTutorBalance = useCallback((tutorId) => {
 		return useReadContract({
 			address: COURSE_PAYMENT_CA,
@@ -146,6 +201,7 @@ export function useCoursePayment() {
 	}, []);
 
 	// Get Total Tutor Balances
+
 	const {
 		data: totalTutorBalances,
 		isError: isTotalBalancesError,
@@ -173,28 +229,49 @@ export function useCoursePayment() {
 		: "0";
 	const formattedPlatformFee = platformFee ? formatUnits(platformFee, 6) : "0";
 
-	// console.log(registerTutorError)
+	// console.log(getAllowanceStat)
 
 	return {
 		registerTutor,
 		registerTutorHash,
 		isRegisterTutorPending,
+		approveUSDC,
+		approveDataHash,
+		isApproving,
+		approveError:
+			approveError?.cause?.code === 4001
+				? "User denied transaction signature."
+				: approveError?.cause?.reason,
+		getAllowanceStat,
 		registerTutorError:
 			registerTutorError?.cause?.code === 4001
 				? "User denied transaction signature."
 				: registerTutorError?.cause?.reason,
 
 		updateTutorAddress,
+		updateTutorAddressHash,
+		isUpdateTutorAddressPending,
+		updateTutorAddressError:
+			updateTutorAddressError?.cause?.code === 4001
+				? "User denied transaction signature."
+				: updateTutorAddressError?.cause?.reason,
 		withdrawTutorBalance,
+		withdrawTutorBalanceHash,
+		isWithdrawTutorBalancePending,
+		withdrawTutorBalanceError:
+			withdrawTutorBalanceError?.cause?.code === 4001
+				? "User denied transaction signature."
+				: withdrawTutorBalanceError?.cause?.reason,
 		purchaseCourse,
+		purchaseDataHash,
+		isPurchasePending,
+		purchaseError:
+			purchaseError?.cause?.code === 4001
+				? "User denied transaction signature."
+				: purchaseError?.cause?.reason,
 		getTutorBalance,
 		totalTutorBalances: formattedTotalTutorBalances,
 		platformFee: formattedPlatformFee,
-		isPurchaseProcessing,
-		isPurchaseComplete,
-		isTotalBalancesError,
-		isTotalBalancesLoading,
-		isPlatformFeeError,
-		isPlatformFeeLoading,
+		
 	};
 }

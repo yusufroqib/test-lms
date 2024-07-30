@@ -45,8 +45,6 @@ export default function Home() {
 	return (
 		<div className="flex flex-col min-h-[100dvh] bg-gray-200 ">
 			<Navbar />
-			{/* <ConnectButton showBalance={false} /> */}
-			<ConnectButton/>
 
 			<main className="flex-1 ">
 				<section className="bg-muted py-10 md:py-12 lg:py-20">
